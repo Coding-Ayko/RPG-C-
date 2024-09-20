@@ -21,7 +21,8 @@ private:
     int tamanhoAtual;          // Contador de itens na pilha
 }
 
-// IMPLEMENTAR cinnto com slots definidos e peso compartilhado 
+// IMPLEMENTAR cinnto com slots definidos e peso compartilhado  
+//TESTAR 
 class Cinto {
 public:
     Cinto(int slots, int capacidade); // Construtor com número de slots e capacidade total
