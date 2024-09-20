@@ -50,67 +50,84 @@ int Mochila::tamanho() const {
     return topoIndice + 1;
 }
 
-// ------------ Implementação do Cinto (Fila Dinâmica) ------------ //
+// ------------ Implementação do Cinto (Fila Estática) ------------ //
 
-Cinto::Cinto() : inicio(nullptr), fim(nullptr), pesoTotal(0) {}
+Cinto::Cinto(int slots, int capacidade) : tamanho(slots), capacidade(capacidade), pesoTotal(0) {
+    this->slots = new Slot[tamanho]; // Aloca memória para os slots
+    for (int i = 0; i < tamanho; i++) {
+        this->slots[i].ocupado = false; // Inicializa todos os slots como vazios
+        this->slots[i].item = nullptr;
+    }
+}
 
 Cinto::~Cinto() {
-    limpar();
+    for (int i = 0; i < tamanho; i++) {
+        delete slots[i].item; // Libera a memória dos itens, se necessário
+    }
+    delete[] slots; // Libera a memória do array de slots
 }
 
 bool Cinto::vazio() const {
-    return inicio == nullptr;
-}
-
-bool Cinto::cheio() const {
-    return pesoTotal >= CAPACIDADE_PESO;
-}
-
-void Cinto::adicionar(Elemento* item) {
-    int pesoItem = item->getPeso(); // Supondo que Elemento tenha um método getPeso()
-    if (pesoTotal + pesoItem > CAPACIDADE_PESO) {
-        cout << "Cinto cheio! Não é possível adicionar o item." << endl;
-        return;
+    for (int i = 0; i < tamanho; i++) {
+        if (slots[i].ocupado) return false; // Se algum slot estiver ocupado
     }
-
-    NoCinto* novoNo = new NoCinto;
-    novoNo->item = item;
-    novoNo->proximo = nullptr;
-
-    if (vazio()) {
-        inicio = fim = novoNo;
-    } else {
-        fim->proximo = novoNo;
-        fim = novoNo;
-    }
-    pesoTotal += pesoItem;
+    return true;
 }
 
-void Cinto::usar() {
-    if (vazio()) {
-        cout << "Cinto vazio! Não há itens para usar." << endl;
-        return;
+bool Cinto::adicionar(Elemento* item) {
+    if (pesoTotal + item->peso > capacidade) {
+        return false; // Não pode adicionar devido à capacidade total
     }
-
-    NoCinto* temp = inicio;
-    inicio = inicio->proximo;
-    pesoTotal -= temp->item->getPeso();
-    delete temp;
-
-    if (inicio == nullptr) {
-        fim = nullptr;
+    for (int i = 0; i < tamanho; i++) {
+        if (!slots[i].ocupado) {
+            slots[i].item = item; // Adiciona o item ao slot
+            slots[i].ocupado = true; // Marca o slot como ocupado
+            pesoTotal += item->peso; // Atualiza o peso total
+            return true; // Adicionado com sucesso
+        }
     }
+    return false; // Cinto cheio
 }
 
-void Cinto::limpar() {
-    while (inicio != nullptr) {
-        usar();  // Remove e usa todos os itens até a fila ficar vazia
+bool Cinto::remover(int slotIndex, Elemento* &item) {
+    if (slotIndex < 0 || slotIndex >= tamanho || !slots[slotIndex].ocupado) {
+        item = nullptr; // Slot inválido ou vazio
+        return false;
     }
+    item = slots[slotIndex].item; // Pega o item
+    slots[slotIndex].item = nullptr; // Limpa o slot
+    slots[slotIndex].ocupado = false; // Marca o slot como vazio
+    pesoTotal -= item->peso; // Atualiza o peso total
+    return true; // Removido com sucesso
 }
 
-int Cinto::pesoAtual() const {
-    return pesoTotal;
+Elemento* Cinto::obter(int slotIndex) const {
+    if (slotIndex < 0 || slotIndex >= tamanho) {
+        return nullptr; // Slot inválido
+    }
+    return slots[slotIndex].ocupado ? slots[slotIndex].item : nullptr; // Retorna o item, se houver
 }
+
+int Cinto::obterPesoTotal() const {
+    return pesoTotal; // Retorna o peso total dos itens
+}
+
+int Cinto::getSlots() const {
+    return tamanho; // Retorna o número total de slots
+}
+
+int Cinto::getSlotsUsados() const {
+    int usados = 0;
+    for (int i = 0; i < tamanho; i++) {
+        if (slots[i].ocupado) usados++; // Conta slots ocupados
+    }
+    return usados;
+}
+
+int Cinto::getCapacidade() const {
+    return capacidade; // Retorna a capacidade total de peso
+}
+
 
 
 #endif

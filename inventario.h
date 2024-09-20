@@ -1,21 +1,5 @@
 #include "elementos.h" 
-// Refazer mochila, ela é uma pilha dinamica
-class Mochila {
-public:
-    Mochila();  // Construtor
-    bool vazio() const;
-    bool cheio() const;
-    void adiciona(Elemento* item); // Push - Adiciona item no topo                // pega o item da classe elemento
-    void remove(Elemento* &item);  // Pop - Remove item do topo                   // pega o item da classe elemento
-    Elemento* topo() const;         // Top - Retorna o item no topo
-    void limpar();                  // Remove todos os itens
-    int tamanho() const;
-
-private:
-    static const int CAPACIDADE = 10;  // Capacidade máxima da pilha (mochila)
-    Elemento* itens[CAPACIDADE];       // Array estático para armazenar os elementos
-    int topoIndice;                    // Índice do topo da pilha
-};
+// mochila, ela é uma pilha dinamica
 
 class Mochila {
 public:
@@ -36,6 +20,34 @@ private:
   MochilaNode* topoPilha;  // Ponteiro para o topo da pilha
     int tamanhoAtual;          // Contador de itens na pilha
 }
+
+// IMPLEMENTAR cinnto com slots definidos e peso compartilhado 
+class Cinto {
+public:
+    Cinto(int slots, int capacidade); // Construtor com número de slots e capacidade total
+    ~Cinto();                          // Destrutor
+    bool vazio() const;                // Verifica se o cinto está vazio
+    bool adicionar(Elemento* item);    // Adiciona um item a um slot disponível
+    bool remover(int slotIndex, Elemento* &item); // Remove um item de um slot específico
+    Elemento* obter(int slotIndex) const; // Retorna o item de um slot específico
+    int obterPesoTotal() const;        // Retorna o peso total dos itens no cinto
+    int getSlots() const;              // Retorna o número total de slots
+    int getSlotsUsados() const;        // Retorna o número de slots usados
+    int getCapacidade() const;         // Retorna a capacidade total de peso
+
+private:
+    struct Slot {
+        Elemento* item;  // Ponteiro para o item
+        bool ocupado;     // Indica se o slot está ocupado
+    };
+
+    Slot* slots;          // Array de slots
+    int tamanho;         // Número total de slots
+    int pesoTotal;       // Peso total dos itens
+    int capacidade;      // Capacidade total de peso
+};
+
+
 
 
 
