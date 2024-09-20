@@ -12,35 +12,35 @@ Elemento::Elemento() : nome(""), peso(0), valor(0), tipo(INIMIGO) {}
 Elemento::Elemento(const string& nome, int peso, int valor, Tipo tipo)
     : nome(nome), peso(peso), valor(valor), tipo(tipo) {}
 
-string Elemento::getNome() const {
+string Elemento::retornaNome() const {
     return nome;
 }
 
-void Elemento::setNome(const string& nome) {
+void Elemento::declararNome(const string& nome) {
     this->nome = nome;
 }
 
-int Elemento::getPeso() const {
+int Elemento::retornaPeso() const {
     return peso;
 }
 
-void Elemento::setPeso(int peso) {
+void Elemento::declaraPeso(int peso) {
     this->peso = peso;
 }
 
-int Elemento::getValor() const {
+int Elemento::retornaValor() const {
     return valor;
 }
 
-void Elemento::setValor(int valor) {
+void Elemento::declaraValor(int valor) {
     this->valor = valor;
 }
 
-Elemento::Tipo Elemento::getTipo() const {
+Elemento::Tipo Elemento::retornaTipo() const {
     return tipo;
 }
 
-void Elemento::setTipo(Tipo tipo) {
+void Elemento::declaraTipo(Tipo tipo) {
     this->tipo = tipo;
 }
 
