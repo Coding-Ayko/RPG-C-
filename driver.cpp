@@ -6,8 +6,6 @@
 using namespace std;
 
 int main() {
-    // Testando a classe Elemento e suas subclasses
-
     // Criando alguns elementos
     Elemento* espada = new Arma("Espada", 5, 100, 20);
     Elemento* cura = new Potao("Poção de Cura", 1, 50, 30);
@@ -21,7 +19,7 @@ int main() {
     cout << "Inimigo: " << dragao->getNome() << ", Peso: " << dragao->getPeso() 
          << ", Valor: " << dragao->getValor() << ", Força: " << dynamic_cast<Inimigo*>(dragao)->getForca() << endl;
 
-    // Testando a classe Mochila (Pilha Estática)
+    // Testando a classe Mochila (Pilha Dinamica)
     Mochila mochila;
     mochila.Push(espada);
     mochila.Push(cura);
@@ -35,7 +33,7 @@ int main() {
         mochila.Pop(item);
     }
 
-    // Testando a classe Cinto (Fila Dinâmica)
+    // Testando a classe Cinto (Lista Estatica)
     Cinto cinto;
     cinto.Enqueue(espada);
     cinto.Enqueue(cura);
