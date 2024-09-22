@@ -1,133 +1,147 @@
-#ifndef INVENTORY_H
-#define INVENTORY_H
-
-#include "inventory.h"
-#include "../elements/elements.h" // Corrigido para caminho relativo
+#include "inventario.h"
+#include "elementos.h"
 #include <iostream>
+
 using namespace std;
 
-// ------------ Implementação da Mochila (Pilha Estática) ------------ //
+#ifndef INVENTARIO_H
+#define INVENTARIO_H
 
-Mochila::Mochila() : topoIndice(-1) {}
+// ------------ Implementação da Mochila (Pilha Dinamica) ------------ //
 
-bool Mochila::vazia() const {
-    return topoIndice == -1;
+Mochila::Mochila() : topoPilha(NULL), tamanhoAtual(0) {}
+
+Mochila::~Mochila() {
+    Clear();  // Limpa todos os elementos
 }
 
-bool Mochila::cheia() const {
-    return topoIndice == CAPACIDADE - 1;
+bool Mochila::Empty() const {
+    return topoPilha == NULL;
 }
 
-void Mochila::adicionar(Elemento* item) {
-    if (cheia()) {
-        cout << "Mochila cheia! Não é possível adicionar o item." << endl;
+void Mochila::Push(Elemento* item) {
+    MochilaNode* novoNode = new MochilaNode;
+    novoNode->item = item;
+    novoNode->next = topoPilha;
+    topoPilha = novoNode;
+    tamanhoAtual++;
+}
+
+void Mochila::Pop(Elemento* &item) {
+    if (Empty()) {
+        cout << "Mochila vazia!" << endl;
         return;
     }
-    itens[++topoIndice] = item;
-}
-
-void Mochila::remover(Elemento* &item) {
-    if (vazia()) {
-        cout << "Mochila vazia! Não há itens para remover." << endl;
-        return;
-    }
-    item = itens[topoIndice--];
+    MochilaNode* temp = topoPilha;
+    item = topoPilha->item;
+    topoPilha = topoPilha->next;
+    delete temp;
+    tamanhoAtual--;
 }
 
 Elemento* Mochila::topo() const {
-    if (vazia()) {
-        cout << "Mochila vazia! Não há itens no topo." << endl;
+    if (Empty()) {
         return nullptr;
     }
-    return itens[topoIndice];
+    return topoPilha->item;
 }
 
-void Mochila::limpar() {
-    topoIndice = -1;
+void Mochila::Clear() {
+    while (!Empty()) {
+        Elemento* temp;
+        Pop(temp);  // Remove e deleta todos os nós
+    }
 }
 
-int Mochila::tamanho() const {
-    return topoIndice + 1;
+int Mochila::Size() const {
+    return tamanhoAtual;
 }
 
-// ------------ Implementação do Cinto (Fila Estática) ------------ //
+// ------------ Implementação do Cinto (Lista Estatica) ------------ //
+#include "inventario.h"
+#include "elementos.h"
+#include <iostream>
+
+using namespace std;
 
 Cinto::Cinto(int slots, int capacidade) : tamanho(slots), capacidade(capacidade), pesoTotal(0) {
-    this->slots = new Slot[tamanho]; // Aloca memória para os slots
+    this->slots = new Slot[tamanho];  // Aloca memória para o array de slots
     for (int i = 0; i < tamanho; i++) {
-        this->slots[i].ocupado = false; // Inicializa todos os slots como vazios
-        this->slots[i].item = nullptr;
+        this->slots[i].ocupado = false;   // Inicializa todos os slots como vazios
+        this->slots[i].item = nullptr;    // Inicializa os ponteiros como nulos
     }
 }
 
 Cinto::~Cinto() {
     for (int i = 0; i < tamanho; i++) {
-        delete slots[i].item; // Libera a memória dos itens, se necessário
+        delete slots[i].item;  // Libera a memória dos itens, se necessário
     }
-    delete[] slots; // Libera a memória do array de slots
+    delete[] slots;            // Libera a memória do array de slots
 }
 
-bool Cinto::vazio() const {
+bool Cinto::Empty() const {
     for (int i = 0; i < tamanho; i++) {
-        if (slots[i].ocupado) return false; // Se algum slot estiver ocupado
+        if (slots[i].ocupado) return false;  // Se algum slot estiver ocupado, o cinto não está vazio
     }
     return true;
 }
 
-bool Cinto::adicionar(Elemento* item) {
-    if (pesoTotal + item->peso > capacidade) {
-        return false; // Não pode adicionar devido à capacidade total
-    }
-    for (int i = 0; i < tamanho; i++) {
-        if (!slots[i].ocupado) {
-            slots[i].item = item; // Adiciona o item ao slot
-            slots[i].ocupado = true; // Marca o slot como ocupado
-            pesoTotal += item->peso; // Atualiza o peso total
-            return true; // Adicionado com sucesso
-        }
-    }
-    return false; // Cinto cheio
-}
-
-bool Cinto::remover(int slotIndex, Elemento* &item) {
-    if (slotIndex < 0 || slotIndex >= tamanho || !slots[slotIndex].ocupado) {
-        item = nullptr; // Slot inválido ou vazio
+bool Cinto::Insert(Elemento* item) {
+    if (pesoTotal + item->getPeso() > capacidade) {  // Verifica se o peso total excederia a capacidade
+        cout << "Capacidade do cinto excedida!" << endl;
         return false;
     }
-    item = slots[slotIndex].item; // Pega o item
+    for (int i = 0; i < tamanho; i++) {
+        if (!slots[i].ocupado) {  // Encontra o primeiro slot vazio
+            slots[i].item = item;    // Adiciona o item ao slot
+            slots[i].ocupado = true; // Marca o slot como ocupado
+            pesoTotal += item->getPeso();  // Atualiza o peso total do cinto
+            return true;             // Item adicionado com sucesso
+        }
+    }
+    cout << "Cinto cheio!" << endl;
+    return false;  // Cinto está cheio
+}
+
+bool Cinto::Delete(int slotIndex, Elemento* &item) {
+    if (slotIndex < 0 || slotIndex >= tamanho || !slots[slotIndex].ocupado) {
+        cout << "Slot inválido ou vazio!" << endl;
+        item = nullptr;
+        return false;  // Slot não contém nenhum item válido
+    }
+    item = slots[slotIndex].item;    // Pega o item do slot
     slots[slotIndex].item = nullptr; // Limpa o slot
     slots[slotIndex].ocupado = false; // Marca o slot como vazio
-    pesoTotal -= item->peso; // Atualiza o peso total
-    return true; // Removido com sucesso
+    pesoTotal -= item->getPeso();    // Atualiza o peso total do cinto
+    return true;  // Item removido com sucesso
 }
 
 Elemento* Cinto::obter(int slotIndex) const {
     if (slotIndex < 0 || slotIndex >= tamanho) {
-        return nullptr; // Slot inválido
+        cout << "Slot inválido!" << endl;
+        return nullptr;  // Índice fora dos limites
     }
-    return slots[slotIndex].ocupado ? slots[slotIndex].item : nullptr; // Retorna o item, se houver
+    return slots[slotIndex].ocupado ? slots[slotIndex].item : nullptr;  // Retorna o item no slot ou nullptr
 }
 
 int Cinto::obterPesoTotal() const {
-    return pesoTotal; // Retorna o peso total dos itens
+    return pesoTotal;  // Retorna o peso total dos itens no cinto
 }
 
 int Cinto::getSlots() const {
-    return tamanho; // Retorna o número total de slots
+    return tamanho;  // Retorna o número total de slots
 }
 
 int Cinto::getSlotsUsados() const {
     int usados = 0;
     for (int i = 0; i < tamanho; i++) {
-        if (slots[i].ocupado) usados++; // Conta slots ocupados
+        if (slots[i].ocupado) usados++;  // Conta quantos slots estão ocupados
     }
     return usados;
 }
 
 int Cinto::getCapacidade() const {
-    return capacidade; // Retorna a capacidade total de peso
+    return capacidade;  // Retorna a capacidade total de peso do cinto
 }
-
-
 
 #endif

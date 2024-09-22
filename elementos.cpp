@@ -1,9 +1,10 @@
+#include "elementos.h"
 #include <string>
-#include "elements.h"
+
 using namespace std;
 
-#ifndef ELEMENTS_H
-#define ELEMENTS_H
+#ifndef ELEMENTOS_H
+#define ELEMENTOS_H
 
 // Implementação da classe Elemento
 
@@ -12,40 +13,39 @@ Elemento::Elemento() : nome(""), peso(0), valor(0), tipo(INIMIGO) {}
 Elemento::Elemento(const string& nome, int peso, int valor, Tipo tipo)
     : nome(nome), peso(peso), valor(valor), tipo(tipo) {}
 
-string Elemento::retornaNome() const {
+string Elemento::getNome() const {
     return nome;
 }
 
-void Elemento::declararNome(const string& nome) {
+void Elemento::setNome(const string& nome) {
     this->nome = nome;
 }
 
-int Elemento::retornaPeso() const {
+int Elemento::getPeso() const {
     return peso;
 }
 
-void Elemento::declaraPeso(int peso) {
+void Elemento::setPeso(int peso) {
     this->peso = peso;
 }
 
-int Elemento::retornaValor() const {
+int Elemento::getValor() const {
     return valor;
 }
 
-void Elemento::declaraValor(int valor) {
+void Elemento::setValor(int valor) {
     this->valor = valor;
 }
 
-Elemento::Tipo Elemento::retornaTipo() const {
+Elemento::Tipo Elemento::getTipo() const {
     return tipo;
 }
 
-void Elemento::declaraTipo(Tipo tipo) {
+void Elemento::setTipo(Tipo tipo) {
     this->tipo = tipo;
 }
 
 // Implementação da classe Inimigo
-
 Inimigo::Inimigo(const string& nome, int peso, int valor, int forca)
     : Elemento(nome, peso, valor, Elemento::INIMIGO), forca(forca) {}
 
@@ -58,7 +58,6 @@ void Inimigo::setForca(int forca) {
 }
 
 // Implementação da classe Arma
-
 Arma::Arma(const string& nome, int peso, int valor, int dano)
     : Elemento(nome, peso, valor, Elemento::ARMA), dano(dano) {}
 
@@ -71,7 +70,6 @@ void Arma::setDano(int dano) {
 }
 
 // Implementação da classe Potao
-
 Potao::Potao(const string& nome, int peso, int valor, int cura)
     : Elemento(nome, peso, valor, Elemento::POTAO), cura(cura) {}
 
@@ -82,6 +80,5 @@ int Potao::getCura() const {
 void Potao::setCura(int cura) {
     this->cura = cura;
 }
-
 
 #endif // ELEMENTO_H
