@@ -1,7 +1,7 @@
-#include "character/character.h"
-#include "elements/elements.h"
-#include "inventory/inventory.h"
-#include "map/map.h"
+#include "personagem.h"
+#include "elementos.h"
+#include "inventario.h"
+#include "mapa.h"
 #include <iostream>
 using namespace std;
 
