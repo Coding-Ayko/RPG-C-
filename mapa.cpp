@@ -1,153 +1,207 @@
 // ====================       SEÇÃO DE IMPLEMENTAÇÃO   ==================== //
-
-
 #include "mapa.h"
-// #include "elemento.h" // implementar depois
+#include "personagem.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 using namespace std;
 
-#ifndef MAPA_H
-#define MAPA_H
-
 // ==================== IMPLEMENTAÇÃO DA CLASSE SQM ==================== //
 
-Sqm::Sqm() : tipo('E') {
-    srand(time(0));
+Sqm::Sqm() : sqmType('V') {  // Inicializa sqmType como 'V'
+  srand(static_cast<unsigned int>(time(0))); // Inicializa o gerador de números aleatórios
 }
 
-char Sqm::tipoSQM() const {
-    return tipo;
+char Sqm::getSqmType() const {
+  return sqmType;  // Retorna o valor do tipo de SQM
 }
 
-void Sqm::declararTipoSQM(char novoTipo) {
-    tipo = novoTipo;
+void Sqm::setSqmType(char newType) {
+  sqmType = newType;  // Define um novo tipo de SQM
 }
 
-void Sqm::gerarSQMAleatorio() {
-    int numAleatorio = rand() % 3;
-    switch (numAleatorio) {
-        case 0:
-            tipo = 'V'; // Vazio
-            break;
-        case 1:
-            tipo = 'E'; // Elemento
-            break;
-        case 2:
-            tipo = 'I'; // Inimigo
-            break;
+void Sqm::generateRandomSqmType() {
+  int randomNum = rand() % 3;  // Gera números entre 0 e 2
+  static char lastType = '\0'; // Inicialmente sem valor
+
+  do {
+    randomNum = rand() % 3;
+  } while ((randomNum == 0 && lastType == 'V') ||
+    (randomNum == 1 && lastType == 'E') ||
+    (randomNum == 2 && lastType == 'I'));
+
+  switch (randomNum) {
+    case 0: sqmType = 'V'; break; // Vazio
+    case 1: sqmType = 'E'; break; // Elemento
+    case 2: sqmType = 'I'; break; // Inimigo
+  }
+
+  lastType = sqmType;
+}
+
+// ==================== IMPLEMENTAÇÃO DA CLASSE MAPA ==================== //
+
+Mapa::Mapa(int larguraMapa, int alturaMapa)
+  : largura(larguraMapa), altura(alturaMapa) {
+  if (largura > MAX_LARGURA) largura = MAX_LARGURA;
+  if (altura > MAX_ALTURA) altura = MAX_ALTURA;
+
+  srand(static_cast<unsigned int>(time(0)));  // Inicializa o gerador aleatório
+  gerarMapa();  // Gera o mapa no momento da criação
+}
+
+int Mapa::getLargura() {
+  return largura; 
+}
+
+int Mapa::getAltura() {
+  return altura; 
+}
+
+bool Mapa::posicaoValida(int x, int y) const {
+  return (x >= 0 && x < largura && y >= 0 && y < altura);
+}
+
+void Mapa::gerarMapa() {
+  for (int y = 0; y < altura; ++y) {
+    for (int x = 0; x < largura; ++x) {
+      grid[y][x].generateRandomSqmType();  // Gera SQMs aleatórios
     }
+  }
+  grid[altura - 1][largura - 1].setSqmType('F'); // Marca o fim do nível
 }
 
-// ==================== IMPLEMENTAÇÃO DA CLASSE ENGINE MAP ==================== //
-
-EngenhariaMapa::EngenhariaMapa() : posicaoHeroi(0), nivelAtual(1), dificuldade(1), score(0) {
-    gerarMapa(); // Gera o mapa inicial
-}
-
-void EngenhariaMapa::declararDificuldade(int nivel) {
-    dificuldade = nivel;
-    gerarMapa(); // Regenera o mapa baseado na nova dificuldade
-}
-
-void EngenhariaMapa::gerarMapa() {
-    for (int i = 0; i < TAMANHO_MAPA; ++i) {
-        mapa[i].gerarSQMAleatorio(); // Gera conteúdo aleatório para cada Sqm
-
-        // Ajuste o conteúdo com base na dificuldade e no nível
-        if (dificuldade > 1) {
-            int numAleatorio = rand() % (3 + dificuldade); // Aumenta a gama de tipos de espaço
-            switch (numAleatorio) {
-                case 0:
-                    mapa[i].declararTipoSQM('V');
-                    break;
-                case 1:
-                    mapa[i].declararTipoSQM('E');
-                    break;
-                default:
-                    mapa[i].declararTipoSQM('I');
-                    break;
-            }
-        }
+void Mapa::exibirMapa(int posHeroiX, int posHeroiY) const {
+  for (int y = 0; y < altura; ++y) {
+    for (int x = 0; x < largura; ++x) {
+      if (x == posHeroiX && y == posHeroiY) {
+        cout << "[x] "; // Representa a posição do herói
+      } else {
+        cout << obterRepresentacaoSQM(x, y) << " "; // Representa o tipo do SQM
+      }
     }
+    cout << endl;
+  }
 }
 
-void EngenhariaMapa::MoverHeroi() {
-    if (posicaoHeroi >= 0 && posicaoHeroi < TAMANHO_MAPA - 1) {
-        posicaoHeroi++; // Move o herói para o próximo sqm
+char Mapa::obterTipoSQM(int x, int y) const {
+  if (posicaoValida(x, y)) {
+    return grid[y][x].getSqmType();
+  }
+  return '\0'; // Retorna um caractere nulo se a posição for inválida
+}
 
-        // Aumenta a pontuação ao mover o herói
-        aumentarScore(10);
+string Mapa::obterRepresentacaoSQM(int x, int y) const {
+  char tipo = obterTipoSQM(x, y);
+  if (tipo == 'V') return "[]"; // Vazio
+  if (tipo == 'E') return "[E]"; // Elemento
+  if (tipo == 'I') return "[I]"; // Inimigo
+  if (tipo == 'F') return "[F]"; // Fim
+  return "[]"; // Caso padrão
+}
 
-        // Adiciona pontos baseados no tipo de espaço
-        char tipoSQM = mapa[posicaoHeroi].tipoSQM();
-        if (tipoSQM == 'E') {
-            aumentarScore(20); // Exemplo: 20 pontos para encontrar um elemento
-        } else if (tipoSQM == 'I') {
-            aumentarScore(30); // Exemplo: 30 pontos para derrotar um inimigo
-        }
+// ==================== IMPLEMENTAÇÃO DA CLASSE ENGINEMAPA ==================== //
 
-        if (finalNivel(posicaoHeroi)) {
-            proximoNivel(); // Avança para o próximo nível se o herói alcançou o fim do nível
-        }
-    } else {
-        cout << "Erro: Movimento fora dos limites do mapa!" << endl;
+EngineMapa::EngineMapa(Mapa& mapa, Personagem& heroi) : mapa(mapa), heroi(heroi), posicaoHeroiX(0), posicaoHeroiY(0), nivelAtual(1), dificuldade(1), score(0) {}
+
+
+void EngineMapa::gerarMapa() {
+  mapa.gerarMapa();  // Gera o mapa
+}
+
+void EngineMapa::reposicionarHeroi(int x, int y) {
+    posicaoHeroiX = x;
+    posicaoHeroiY = y;
+}
+
+void EngineMapa::proximoNivel() {
+  nivelAtual++;
+  declararDificuldade(nivelAtual);
+  dificuldade++; // Pode incrementar a dificuldade, se necessário
+  score += 50; // Adiciona um bônus ao score ao completar o nível
+
+  // Aumentar a vida do herói 
+  heroi.aumentarVida(20); // Aumenta a vida em 20
+
+  // Gera um novo mapa para o próximo nível
+  mapa.gerarMapa(); // Supondo que você tenha um método para gerar um novo mapa
+
+  // Reposiciona o herói na posição inicial
+  reposicionarHeroi(0, 0); // Supondo que a posição inicial seja (0, 0)
+}
+
+void EngineMapa::declararDificuldade(int nivel) {
+  dificuldade = nivel;
+} //tau do futuro = verificar a necessidade de proporções de aleatoriedade dos sqm de acordo com o nivel
+
+void EngineMapa::aumentarScore(int pontos) {
+  score += pontos;
+}
+
+int EngineMapa::retornarScore() const {
+  return score;
+}
+
+
+bool EngineMapa::moverHeroi(int dx, int dy) {
+  int novaPosX = posicaoHeroiX + dx;
+  int novaPosY = posicaoHeroiY + dy;
+
+  // Verifica se a nova posição está dentro dos limites do mapa
+  if (novaPosX >= 0 && novaPosX < mapa.getLargura() && novaPosY >= 0 && novaPosY < mapa.getAltura()) {
+    posicaoHeroiX = novaPosX;
+    posicaoHeroiY = novaPosY; 
+
+    // Obter o tipo de SQM encontrado
+    char tipoSQM = mapa.obterTipoSQM(posicaoHeroiX, posicaoHeroiY);
+    if (tipoSQM == 'V') {
+      cout << "Voce encontrou um espaço vazio!" << endl;
+    } else if (tipoSQM == 'E') {
+      cout << "Voce encontrou um elemento!" << endl;
+      aumentarScore(20); // Aumenta pontuação ao encontrar um elemento
+    } else if (tipoSQM == 'I') {
+      cout << "Voce encontrou um inimigo!" << endl;
+      aumentarScore(30); // Aumenta pontuação ao encontrar um inimigo
+    } else if (tipoSQM == 'F') {
+      cout << "Voce encontrou o fim do nível!" << endl;
+      aumentarScore(50); // Bônus por concluir o nível
+      proximoNivel(); // Avança para o próximo nível
+      mapa.gerarMapa(); // Gerar um novo mapa para o próximo nível
     }
-}
 
-void EngenhariaMapa::proximoNivel() {
-    nivelAtual++;
-    declararDificuldade(nivelAtual); // Ajusta a dificuldade com base no nível
-    posicaoHeroi = 0; // Reinicia a posição do herói para o início do novo nível
-}
+    return true; // Movimento bem-sucedido
+  }
 
-void EngenhariaMapa::RetornarStatus() const {
-    cout << "Posição do Herói: " << posicaoHeroi << endl;
-    for (int i = 0; i < TAMANHO_MAPA; i++) {
-        cout << "Sqm " << i << ": ";
-        switch (mapa[i].tipoSQM()) {
-            case 'V':
-                cout << "Vazio" << endl;
-                break;
-            case 'E':
-                cout << "Elemento" << endl;
-                break;
-            case 'I':
-                cout << "Inimigo" << endl;
-                break;
-        }
-    }
-}
-
-bool EngenhariaMapa::gameOver() const {
-    return posicaoHeroi == TAMANHO_MAPA - 1;
-}
-
-bool =EngenhariaMapa::finalNivel(int posicao) const {
-    // Adapte os pontos de fim de nível conforme a dificuldade ou o nível atual
-    if (posicao == TAMANHO_MAPA - 1) {
-        return true; // O último espaço do mapa indica o fim do jogo
-    }
-    // Exemplo simples: mudar o final do nível a cada 10 espaços
-    return posicao % (15 + dificuldade) == 0;
-    //colocar essa parte aleatória
-}
-
-void EngenhariaMapa::aumentarScore(int pontos) {
-    score += points; // Adiciona pontos à pontuação
-    cout << "Pontuação Atual: " << score << endl;
-
-    // Verifica se a pontuação atingiu um limite para desbloquear algo
-    if (score >= 100) { // Exemplo: 100 pontos para desbloquear um bônus
-        cout << "Parabéns! Você desbloqueou um bônus!" << endl;
-        // Aqui você pode adicionar a lógica para o bônus desbloqueado
-    }
-}
-
-int EngenhariaMapa::retornarScore() const {
-    return score;
+  return false; // Movimento inválido
 }
 
 
-#endif
+
+void EngineMapa::retornarStatus() {
+  cout << "Score atual: " << score << endl;
+  cout << "Posicao do heroi: (" << posicaoHeroiX << ", " << posicaoHeroiY << ")" << endl;
+}
+
+bool EngineMapa::gameOver() {
+  // temporario
+  return (mapa.obterTipoSQM(posicaoHeroiX, posicaoHeroiY) == 'I'); // Jogo acaba se o herói encontra um inimigo
+  // trocar pra quando o numero de vida do personagem acabar
+}
+
+bool EngineMapa::finalNivel(int posicaoHeroiX, int posicaoHeroiY) const {
+    // Define o ponto de fim do nível como o canto inferior direito do mapa
+    int fimNivelX = mapa.getLargura() - 1; // Última coluna
+    int fimNivelY = mapa.getAltura() - 1;  // Última linha
+
+    // Verifica se a posição do herói corresponde ao fim do nível
+    return (posicaoHeroiX == fimNivelX && posicaoHeroiY == fimNivelY);
+}
+
+void EngineMapa::mostrarLegenda() {
+  cout << "Legenda:" << endl;
+  cout << "[ ] - Vazio" << endl;
+  cout << "[E] - Elemento" << endl;
+  cout << "[I] - Inimigo" << endl;
+  cout << "[F] - Fim" << endl;
+  cout << "[x] - Posico do Heroi" << endl;
+}
