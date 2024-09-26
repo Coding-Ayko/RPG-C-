@@ -1,67 +1,61 @@
-#include "personagem.h"
-#include "elementos.h"
-#include "inventario.h"
-#include "mapa.h"
 #include <iostream>
+#include <string>
+#include "mapa.h"
+#include "personagem.h"
+
 using namespace std;
 
 int main() {
-    // Criando alguns elementos
-    Elemento* espada = new Arma("Espada", 5, 100, 20);
-    Elemento* cura = new Potao("Poção de Cura", 1, 50, 30);
-    Elemento* dragao = new Inimigo("Dragão", 100, 0, 50);
+  Mapa mapa(5, 5); // Cria um mapa de 5x5
 
-    cout << "Teste Elementos:" << endl;
-    cout << "Arma: " << espada->getNome() << ", Peso: " << espada->getPeso() 
-         << ", Valor: " << espada->getValor() << ", Dano: " << dynamic_cast<Arma*>(espada)->getDano() << endl;
-    cout << "Poção: " << cura->getNome() << ", Peso: " << cura->getPeso() 
-         << ", Valor: " << cura->getValor() << ", Cura: " << dynamic_cast<Potao*>(cura)->getCura() << endl;
-    cout << "Inimigo: " << dragao->getNome() << ", Peso: " << dragao->getPeso() 
-         << ", Valor: " << dragao->getValor() << ", Força: " << dynamic_cast<Inimigo*>(dragao)->getForca() << endl;
+  // Solicita o nome do herói
+  string nomeHeroi;
+  cout << "Digite o nome do seu heroi: ";
+  getline(cin, nomeHeroi);
 
-    // Testando a classe Mochila (Pilha Dinamica)
-    Mochila mochila;
-    mochila.Push(espada);
-    mochila.Push(cura);
-    mochila.Push(dragao);
+  // Cria o personagem com o nome escolhido
+  Personagem heroi(nomeHeroi, 100, 10, 5); // Nome, vida, ataque, defesa
+  EngineMapa engine(mapa, heroi);
 
-    cout << "\nTeste Mochila (Pilha Estática):" << endl;
-    Elemento* item;
-    while (!mochila.Empty()) {
-        mochila.Top(item);
-        cout << "Item no topo: " << item->getNome() << endl;
-        mochila.Pop(item);
+  // Define dificuldade e inicia o nível
+  engine.declararDificuldade(1); // Dificuldade inicial
+
+  cout << "Bem-vindo ao RPG, " << nomeHeroi << "! Prepare-se para a aventura! (nada na verdade)" << endl;
+
+  while (true) {
+    // Exibe o mapa e status
+    mapa.exibirMapa(engine.getPosHeroiX(), engine.getPosHeroiY());
+    engine.mostrarLegenda();
+    engine.retornarStatus();
+    cout << "Pontuacao atual: " << engine.retornarScore() << " | Nivel: " << engine.getNivelAtual() << " | Vida: 100" << endl;
+    //ver como trazer a vida
+
+    // Recebe o comando de movimento
+    string comando;
+    cout << "Digite um comando (norte, sul, esquerda, direita) ou 'sair' para encerrar: ";
+    cin >> comando;
+
+    if (comando == "sair") {
+      cout << "Saindo do jogo..." << endl;
+      break;
+    } else if (comando == "norte") {
+      engine.moverHeroi(0, -1);
+    } else if (comando == "sul") {
+      engine.moverHeroi(0, 1);
+    } else if (comando == "esquerda") {
+      engine.moverHeroi(-1, 0);
+    } else if (comando == "direita") {
+      engine.moverHeroi(1, 0);
+    } else {
+      cout << "Comando invalido! Tente novamente." << endl;
+      continue;
     }
 
-    // Testando a classe Cinto (Lista Estatica)
-    Cinto cinto;
-    cinto.Enqueue(espada);
-    cinto.Enqueue(cura);
-    cinto.Enqueue(dragao);
-
-    cout << "\nTeste Cinto (Fila Dinâmica):" << endl;
-    while (!cinto.Empty()) {
-        cinto.Dequeue(item);
-        cout << "Item removido da fila: " << item->getNome() << endl;
+    if (engine.gameOver()) {
+      cout << "Game Over! Seu heroi caiu em batalha. ( ainda não temos batalha )" << endl;
+      break;
     }
+  }
 
-    // Testando a classe EngineMap
-    EngineMap mapa;
-    mapa.printStatus();
-
-    // Movendo o herói pelo mapa
-    cout << "\nMovendo o herói pelo mapa:" << endl;
-    while (!mapa.gameOver()) {
-        mapa.moveHero();
-        mapa.printStatus();
-    }
-
-    cout << "\nFim do jogo. Pontuação final: " << mapa.getScore() << endl;
-
-    // Limpeza de memória
-    delete espada;
-    delete cura;
-    delete dragao;
-
-    return 0;
+  return 0;
 }

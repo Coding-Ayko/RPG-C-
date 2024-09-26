@@ -183,9 +183,7 @@ void EngineMapa::retornarStatus() {
 }
 
 bool EngineMapa::gameOver() {
-  // temporario
-  return (mapa.obterTipoSQM(posicaoHeroiX, posicaoHeroiY) == 'I'); // Jogo acaba se o herói encontra um inimigo
-  // trocar pra quando o numero de vida do personagem acabar
+    return heroi.Vida() <= 0; // Supondo que a classe Personagem tenha um método getVida()
 }
 
 bool EngineMapa::finalNivel(int posicaoHeroiX, int posicaoHeroiY) const {

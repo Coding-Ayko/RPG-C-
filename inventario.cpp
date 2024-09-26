@@ -1,147 +1,205 @@
 #include "inventario.h"
-#include "elementos.h"
 #include <iostream>
-
 using namespace std;
 
-#ifndef INVENTARIO_H
-#define INVENTARIO_H
 
-// ------------ Implementação da Mochila (Pilha Dinamica) ------------ //
-
-Mochila::Mochila() : topoPilha(NULL), tamanhoAtual(0) {}
-
-Mochila::~Mochila() {
-    Clear();  // Limpa todos os elementos
+Mochila::Mochila() {
+    top = nullptr;
+    count = 0;
 }
 
-bool Mochila::Empty() const {
-    return topoPilha == NULL;
+Mochila::~Mochila() { 
+    Clear();
+}
+
+bool Mochila::Empty() {
+    return top == nullptr;
 }
 
 void Mochila::Push(Elemento* item) {
-    MochilaNode* novoNode = new MochilaNode;
-    novoNode->item = item;
-    novoNode->next = topoPilha;
-    topoPilha = novoNode;
-    tamanhoAtual++;
+    NodePointer p = new Node;
+    if (p == nullptr) {
+        cout << "Memória insuficiente!" << endl;
+        abort();
+    }
+    p->item = item;
+    p->next = top;
+    top = p;
+    count++;
 }
 
 void Mochila::Pop(Elemento* &item) {
     if (Empty()) {
-        cout << "Mochila vazia!" << endl;
-        return;
+        cout << "Mochila vazia! Não há itens para remover." << endl;
+        abort();
     }
-    MochilaNode* temp = topoPilha;
-    item = topoPilha->item;
-    topoPilha = topoPilha->next;
-    delete temp;
-    tamanhoAtual--;
+    NodePointer p = top;
+    item = top->item;
+    top = top->next;
+    delete p;
+    count--;
 }
 
-Elemento* Mochila::topo() const {
+void Mochila::Top(Elemento* &item) {
     if (Empty()) {
-        return nullptr;
+        cout << "Mochila vazia! Não há itens no topo." << endl;
+        abort();
     }
-    return topoPilha->item;
+    item = top->item;
 }
 
 void Mochila::Clear() {
+    Elemento* item;
     while (!Empty()) {
-        Elemento* temp;
-        Pop(temp);  // Remove e deleta todos os nós
+        Pop(item);
     }
 }
 
-int Mochila::Size() const {
-    return tamanhoAtual;
+int Mochila::Size() {
+    return count;
 }
 
-// ------------ Implementação do Cinto (Lista Estatica) ------------ //
-#include "inventario.h"
-#include "elementos.h"
-#include <iostream>
-
-using namespace std;
-
-Cinto::Cinto(int slots, int capacidade) : tamanho(slots), capacidade(capacidade), pesoTotal(0) {
-    this->slots = new Slot[tamanho];  // Aloca memória para o array de slots
-    for (int i = 0; i < tamanho; i++) {
-        this->slots[i].ocupado = false;   // Inicializa todos os slots como vazios
-        this->slots[i].item = nullptr;    // Inicializa os ponteiros como nulos
+void Mochila::exibir(){
+    if (Empty()) {
+        cout << "Mochila vazia." << endl;
+        return;
+    }
+    
+    cout << "Itens na mochila:" << endl;
+    
+    NodePointer current = top; // Começa do topo da mochila
+    while (current != nullptr) {
+        cout << "- " << current->item->getNome() 
+             << " (Peso: " << current->item->getPeso() << ")" << endl; // Assumindo que Elemento tem getNome() e getPeso()
+        current = current->next; // Move para o próximo item
     }
 }
 
+//====================== Implementação Cinto =================================//
+
+// Construtor do Cinto
+Cinto::Cinto(int numeroSlots, int capacidadeTotal) 
+    : head(nullptr), pesoTotal(0), capacidade(capacidadeTotal) {
+}
+
+// Destrutor do Cinto (libera a memória dos slots)
 Cinto::~Cinto() {
-    for (int i = 0; i < tamanho; i++) {
-        delete slots[i].item;  // Libera a memória dos itens, se necessário
+    Slot* current = head;
+    while (current != nullptr) {
+        Slot* next = current->next;
+        delete current->item; // Supondo que Elemento é alocado dinamicamente
+        delete current;
+        current = next;
     }
-    delete[] slots;            // Libera a memória do array de slots
 }
 
+// Verifica se o cinto está vazio
 bool Cinto::Empty() const {
-    for (int i = 0; i < tamanho; i++) {
-        if (slots[i].ocupado) return false;  // Se algum slot estiver ocupado, o cinto não está vazio
+    return head == nullptr;
+}
+
+// Adiciona um item em uma posição específica
+bool Cinto::Insert(Elemento* item, int pos) {
+    if (pesoTotal + item->getPeso() > capacidade) {
+        return false;  // Excede a capacidade
     }
+
+    Slot* newSlot = new Slot{item, nullptr};
+
+    // Caso de inserir no início
+    if (pos == 0) {
+        newSlot->next = head;
+        head = newSlot;
+        pesoTotal += item->getPeso();
+        return true;
+    }
+
+    // Navegar até a posição desejada
+    Slot* current = head;
+    for (int i = 0; i < pos - 1 && current != nullptr; ++i) {
+        current = current->next;
+    }
+
+    if (current == nullptr) {
+        delete newSlot;  // Libera a memória se a posição não existe
+        return false;
+    }
+
+    newSlot->next = current->next;
+    current->next = newSlot;
+    pesoTotal += item->getPeso();
     return true;
 }
 
-bool Cinto::Insert(Elemento* item) {
-    if (pesoTotal + item->getPeso() > capacidade) {  // Verifica se o peso total excederia a capacidade
-        cout << "Capacidade do cinto excedida!" << endl;
+// Remove um item de uma posição específica
+bool Cinto::Delete(int pos, Elemento*& item) {
+    if (Empty()) {
         return false;
     }
-    for (int i = 0; i < tamanho; i++) {
-        if (!slots[i].ocupado) {  // Encontra o primeiro slot vazio
-            slots[i].item = item;    // Adiciona o item ao slot
-            slots[i].ocupado = true; // Marca o slot como ocupado
-            pesoTotal += item->getPeso();  // Atualiza o peso total do cinto
-            return true;             // Item adicionado com sucesso
-        }
+
+    Slot* current = head;
+
+    // Caso de remover o primeiro slot
+    if (pos == 0) {
+        head = head->next;
+        item = current->item;
+        delete current;
+        pesoTotal -= item->getPeso();
+        return true;
     }
-    cout << "Cinto cheio!" << endl;
-    return false;  // Cinto está cheio
+
+    // Navegar até a posição anterior ao slot que será removido
+    for (int i = 0; i < pos - 1 && current != nullptr; ++i) {
+        current = current->next;
+    }
+
+    if (current == nullptr || current->next == nullptr) {
+        return false;  // Posição inválida
+    }
+
+    Slot* toDelete = current->next;
+    current->next = toDelete->next;
+    item = toDelete->item;
+    delete toDelete;
+    pesoTotal -= item->getPeso();
+    return true;
 }
 
-bool Cinto::Delete(int slotIndex, Elemento* &item) {
-    if (slotIndex < 0 || slotIndex >= tamanho || !slots[slotIndex].ocupado) {
-        cout << "Slot inválido ou vazio!" << endl;
-        item = nullptr;
-        return false;  // Slot não contém nenhum item válido
+// Retorna o item em uma posição específica
+Elemento* Cinto::obter(int pos) const {
+    Slot* current = head;
+    for (int i = 0; i < pos && current != nullptr; ++i) {
+        current = current->next;
     }
-    item = slots[slotIndex].item;    // Pega o item do slot
-    slots[slotIndex].item = nullptr; // Limpa o slot
-    slots[slotIndex].ocupado = false; // Marca o slot como vazio
-    pesoTotal -= item->getPeso();    // Atualiza o peso total do cinto
-    return true;  // Item removido com sucesso
+    return (current != nullptr) ? current->item : nullptr;
 }
 
-Elemento* Cinto::obter(int slotIndex) const {
-    if (slotIndex < 0 || slotIndex >= tamanho) {
-        cout << "Slot inválido!" << endl;
-        return nullptr;  // Índice fora dos limites
-    }
-    return slots[slotIndex].ocupado ? slots[slotIndex].item : nullptr;  // Retorna o item no slot ou nullptr
-}
-
+// Retorna o peso total dos itens no cinto
 int Cinto::obterPesoTotal() const {
-    return pesoTotal;  // Retorna o peso total dos itens no cinto
+    return pesoTotal;
+}
+
+// Retorna a capacidade total de peso
+int Cinto::getCapacidade() const {
+    return capacidade;
 }
 
 int Cinto::getSlots() const {
-    return tamanho;  // Retorna o número total de slots
-}
+     return slots;
+ }        // Retorna o número de slots
 
-int Cinto::getSlotsUsados() const {
-    int usados = 0;
-    for (int i = 0; i < tamanho; i++) {
-        if (slots[i].ocupado) usados++;  // Conta quantos slots estão ocupados
+// Exibe todos os itens no cinto
+void Cinto::exibir() const {
+    if (Empty()) {
+        cout << "Cinto vazio." << endl;
+    } else {
+        cout << "Itens no cinto:" << endl;
+        Slot* current = head; // Começa pelo primeiro slot do cinto
+        while (current) {
+            cout << "- " << current->item->getNome() << " (Peso: " << current->item->getPeso() << ")" << endl;
+            current = current->next; // Avança para o próximo slot
+        }
     }
-    return usados;
 }
 
-int Cinto::getCapacidade() const {
-    return capacidade;  // Retorna a capacidade total de peso do cinto
-}
 
-#endif
