@@ -10,7 +10,7 @@ Explorar um mapa, interagir com diferentes elementos e inimigos, gerenciar um in
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/projeto-jogo-aventura.git
+   git clone https://github.com/Coding-Ayko/RPG-C-.git
    ```
 2. Compile os arquivos fontes do jogo:
    ```bash
