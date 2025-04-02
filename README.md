@@ -21,20 +21,6 @@ Explorar um mapa, interagir com diferentes elementos e inimigos, gerenciar um in
    ./programa.exe
    ```
 
-## Instruções do Jogo
-
-- **Explorar**: Movimente-se pelo mapa e descubra novos locais e itens.
-- **Inventário**: Consulte e gerencie os itens coletados.
-- **Lutar**: Enfrente inimigos usando armas e itens.
-- **Missões**: Complete objetivos para avançar na história.
-
-## Controles
-
-- **Movimentação**: `WASD` ou setas.
-- **Interagir**: Pressione `E`.
-- **Atacar**: Pressione `A`.
-- **Abrir Inventário**: Pressione `I`.
-
 ## Tecnologias Utilizadas
 
 - **Linguagem**: C++
