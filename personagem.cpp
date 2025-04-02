@@ -1,3 +1,8 @@
+//tauane carolina - 2194892
+//Amanda -2217509
+//Julio Fabio - 2165170
+
+
 #include "personagem.h"
 #include "mapa.h"
 #include <iostream>
@@ -78,8 +83,12 @@ void Personagem::MoverDireita(EngineMapa& engine) {
   }
 }
 
-void Personagem::aumentarVida(int pontos) {
-    vida += pontos; // Incrementa a vida atual
+void Personagem::aumentarVida(int quantidade) {
+    vida += quantidade; // Incrementa a vida atual
+}
+
+void Personagem::aumentarAtaque(int quantidade) {
+  forca += quantidade; 
 }
 
 
@@ -88,58 +97,22 @@ bool Personagem::estaVivo() const {
 }
 
 
-
-// O CODIGO ESTÁ FUNCIONANDO SEM A IMPLEMENTAÇÃO DE MOCHILA E CINTO
-//CUIDADO AO DESCOMENTAR
-
-//============================================================================================//
-// IMPLEMENTAR DEPOIS (quando criar o arquivo .h e .cpp de elemento)
-//==============Interação com elementos (cinto e mochila) ==================//
-
-
 bool Personagem::addMochila(Elemento* item) {
-    if (item) {
-        mochila.Push(item);
-        return true;
-    }
-    return false;
+  if (item) {
+    mochila.Push(item);
+    return true;
+  }
+  return false;
 }
 
 bool Personagem::remMochila(Elemento* &item) {
-    if (!mochila.Empty()) {
-        mochila.Pop(item);
-        return true;
-    }
-    return false;
+  if (!mochila.Empty()) {
+    mochila.Pop(item);
+    return true;
+  }
+  return false;
 }
 
-// void Personagem::exibirMochila() {
-//     if (mochila.Empty()) {
-//         cout << "Mochila vazia." << endl;
-//     } else {
-//         // Aqui você poderia implementar a lógica para exibir os itens da mochila.
-//         // Sugiro iterar sobre a pilha, exibindo os itens.
-//         Elemento* itemAtual = mochila.topo();
-//         while (itemAtual) {
-//             cout << itemAtual->getNome() << endl; // Supondo que Elemento tenha um método getNome()
-//             itemAtual = itemAtual->getNext(); // Se houver um método para obter o próximo item
-//         }
-//     }
-// }
 
-void Personagem::exibirMochila() {
-    mochila.exibir(); // Chama o método de exibir da própria classe Mochila
-}
 
-bool Personagem::addCinto(Elemento* item) {
-    int pos = 0; // Defina a posição desejada. Pode ser calculada de outra maneira.
-    return cinto.Insert(item, pos);
-}
 
-bool Personagem::remCinto(int slotIndex, Elemento* &item) {
-    return cinto.Delete(slotIndex, item);
-}
-
-void Personagem::exibirCinto() const {
-    cinto.exibir(); // Se o método `exibir` de `Cinto` já exibe os itens corretamente
-}

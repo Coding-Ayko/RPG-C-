@@ -1,3 +1,7 @@
+//tauane carolina - 2194892
+//Amanda -2217509
+//Julio Fabio - 2165170
+
 #ifndef PERSONAGEM_H
 #define PERSONAGEM_H
 
@@ -29,7 +33,8 @@ public:
     void MoverSul(EngineMapa& engine);
     void MoverEsquerda(EngineMapa& engine);
     void MoverDireita(EngineMapa& engine);
-    void aumentarVida(int pontos);
+    void aumentarVida(int quantidade);
+    void aumentarAtaque(int quantidade);
 
     // Verifica se o personagem está vivo
     bool estaVivo() const;
@@ -57,4 +62,4 @@ private:
     Cinto cinto;      // Lista estática para itens
 };
 
-#endif // PERSONAGEM_H
+#endif 

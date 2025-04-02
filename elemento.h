@@ -1,3 +1,7 @@
+//tauane carolina - 2194892
+//Amanda -2217509
+//Julio Fabio - 2165170
+
 #ifndef ELEMENTO_H
 #define ELEMENTO_H
 
@@ -7,6 +11,7 @@ using namespace std;
 // Classe base para Elementos
 class Elemento {
 public:
+    virtual ~Elemento() {} // Destrutor virtual
     Elemento(const string& nome, int peso);
     string getNome() const;           // Retorna o nome do item
     int getPeso() const;              // Retorna o peso do item

@@ -1,4 +1,8 @@
-#ifndef INVENTARIO_H  // Verifica se INVENTARIO_H não foi definido
+//tauane carolina - 2194892
+//Amanda -2217509
+//Julio Fabio - 2165170
+
+#ifndef INVENTARIO_H  
 #define INVENTARIO_H
 
 #include "elemento.h"
@@ -14,7 +18,7 @@ public:
     void Top(Elemento* &item);   // Retorna o item do topo da pilha            //criado
     void Clear();   // criado
     int Size();     //criado
-    void exibir();
+    void Exibir();
 private:
     struct Node {
         Elemento* item;
@@ -28,29 +32,29 @@ private:
 
 // Cinto: Lista Encadeada
 class Cinto {
-public:
-    Cinto(int numSlots, int capacidade); // Construtor com número de slots e capacidade total
-    ~Cinto();                             // Destrutor
-    bool Empty() const;                   // Verifica se o cinto está vazio
-    bool Insert(Elemento* item, int pos); // Adiciona um item a um slot disponível
-    bool Delete(int pos, Elemento*& item); // Remove um item de um slot específico
-    Elemento* obter(int pos) const;      // Retorna o item em uma posição específica
-    int obterPesoTotal() const;          // Retorna o peso total dos itens no cinto
-    int getCapacidade() const;           // Retorna a capacidade total de peso
-    int getSlots() const ;        // Retorna o número de slots
-    void exibir() const;   
-    
-
 private:
     struct Slot {
-        Elemento* item;                  // Ponteiro para o item
-        Slot* next;                      // Ponteiro para o próximo slot
+        Elemento* item;
+        Slot* next;
     };
+    Slot* head;
+    int pesoTotal;
+    int capacidade;
+    int slots;
+public:
+    Cinto(int numeroSlots, int capacidadeTotal);
+    ~Cinto();
+    bool Empty() const;
+    bool Insert(Elemento* item, int pos);
+    bool Delete(int pos, Elemento*& item);
+    Elemento* obter(int pos) const; 
+    int obterPesoTotal() const;
+    int getCapacidade() const;
+    int getSlots() const;
+    void Exibir() const;
+    void setPosition(int pos, Slot*& current) const;
 
-    Slot* head;                          // Ponteiro para o primeiro slot
-    int pesoTotal;                       // Peso total dos itens
-    int capacidade;                      // Capacidade total de peso
-    int slots; 
 };
 
-#endif // INVENTARIO_H  // Finaliza a guarda de inclusão
+
+#endif 

@@ -1,3 +1,7 @@
+//tauane carolina - 2194892
+//Amanda -2217509
+//Julio Fabio - 2165170
+
 #include "elemento.h"
 
 // Construtor da classe Elemento
