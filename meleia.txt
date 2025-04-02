@@ -1,0 +1,7 @@
+para rodar 
+
+g++ -o programa mapa.cpp personagem.cpp elemento.cpp inventario.cpp inimigo.cpp cgi.cpp driver.cpp
+
+./programa.exe
+
+e diga as instruções do jogo. Obrigada!
