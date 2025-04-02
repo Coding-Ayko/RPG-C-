@@ -1,6 +1,8 @@
-# Projeto Jogo de Aventura - Estruturas de Dados em C++
+# Projeto RPG - Estruturas de Dados em C++
 
-Este projeto foi criado para aprimorar as habilidades em Estruturas de Dados em C++, implementando um jogo de aventura com diferentes classes e interações.
+# Cult of The Hades
+
+Este projeto foi criado para aprimorar as habilidades em Estruturas de Dados em C++, implementando o Cult of The Hades, com diferentes classes e interações.
 
 ## Objetivo do Jogo
 
